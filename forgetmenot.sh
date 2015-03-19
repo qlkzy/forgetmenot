@@ -4,7 +4,7 @@
 
 checks=$1
 if [ -z "$checks" ]; then
-    checks='untracked,added,modified,deleted'
+    checks='untracked,added,modified,deleted,unpushed'
 fi
 
 function indent {
@@ -13,6 +13,16 @@ function indent {
 
 function status {
     git status --porcelain --short | (grep "$regex" || true)
+}
+
+function unpushed {
+    case $checks in
+        *unpushed*)
+            (git cherry 2>/dev/null || true) |
+                cut -d' ' -f2 |
+                xargs git show --oneline --quiet
+            ;;
+    esac
 }
 
 function addalt {
@@ -46,7 +56,7 @@ find ~ -name '.git' -type d |
     sed -e 's/\.git$//' |
     while read x; do
         cd "$x"
-        status=`status | indent`
+        status=`(status; unpushed) | indent`
         if [ -n "$status" ]; then
             echo -e "$x\n$status"
         fi
