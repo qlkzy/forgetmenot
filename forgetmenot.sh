@@ -1,17 +1,51 @@
 #!/bin/bash -e
 
-checks=$1
-exclude=$2
+function main {
 
-if [ -z "$checks" ] || [ "$checks" == 'all' ]; then
-    checks='untracked,added,modified,deleted,unpushed'
-fi
+    checks=$1
+    exclude=$2
 
-# our default exclude pattern is 'blank lines', which won't
-# hurt anything interesting
-if [ -z "$exclude" ]; then
-    exclude='^$'
-fi
+    if [ -z "$checks" ] || [ "$checks" == 'all' ]; then
+        checks='untracked,added,modified,deleted,unpushed'
+    fi
+
+    # our default exclude pattern is 'blank lines', which won't
+    # hurt anything interesting
+    if [ -z "$exclude" ]; then
+        exclude='^$'
+    fi
+
+    regex=''
+
+    case $checks in
+        *untracked*)
+            regex=`addalt "$regex" '??'`
+            ;;&
+        *added*)
+            regex=`addalt "$regex" 'A'`
+            ;;&
+        *modified*)
+            regex=`addalt "$regex" ' M'`
+            ;;&
+        *deleted*)
+            regex=`addalt "$regex" ' D'`
+            ;;&
+    esac
+
+    regex="^\\($regex\\)"
+
+    find ~ -name '.git' -type d |
+        sed -e 's/\.git$//' |
+        grep -v "$exclude" |
+        while read x; do
+            cd "$x"
+            status=`(status; unpushed) | indent`
+            if [ -n "$status" ]; then
+                echo -e "$x\n$status"
+            fi
+        done
+}
+
 
 function indent {
     sed -e 's/^/\t/'
@@ -39,32 +73,4 @@ function addalt {
     echo "$re$2"
 }
 
-regex=''
-
-case $checks in
-    *untracked*)
-        regex=`addalt "$regex" '??'`
-    ;;&
-    *added*)
-        regex=`addalt "$regex" 'A'`
-    ;;&
-    *modified*)
-        regex=`addalt "$regex" ' M'`
-    ;;&
-    *deleted*)
-        regex=`addalt "$regex" ' D'`
-    ;;&
-esac
-
-regex="^\\($regex\\)"
-
-find ~ -name '.git' -type d |
-    sed -e 's/\.git$//' |
-    grep -v "$exclude" |
-    while read x; do
-        cd "$x"
-        status=`(status; unpushed) | indent`
-        if [ -n "$status" ]; then
-            echo -e "$x\n$status"
-        fi
-    done
+main
