@@ -3,14 +3,18 @@
 checks=''
 exclude=''
 regex=''
+dir=~
 
-while getopts c:e: opt; do
+while getopts c:e:d: opt; do
     case "$opt" in
         c)
             checks="$OPTARG"
             ;;
         e)
             exclude="$OPTARG"
+            ;;
+        d)
+            dir="$OPTARG"
             ;;
     esac
 done
@@ -44,7 +48,7 @@ function main {
 
     regex="^\\($regex\\)"
 
-    find ~ -name '.git' -type d |
+    find $dir -name '.git' -type d |
         sed -e 's/\.git$//' |
         grep -v "$exclude" |
         while read x; do
