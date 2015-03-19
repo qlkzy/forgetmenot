@@ -46,7 +46,11 @@ function main {
             ;;&
     esac
 
-    regex="^\\($regex\\)"
+    if [  "x$regex" == "x" ]; then
+        regex='^$'
+    else
+        regex="^\\($regex\\)"
+    fi
 
     find $dir -name '.git' -type d |
         sed -e 's/\.git$//' |
