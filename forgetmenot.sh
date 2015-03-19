@@ -1,11 +1,11 @@
 #!/bin/bash -e
 
-checks='^\(??\|A\| M\)'
+checks='^\(??\|A\| M| D\)'
 
 function indent {
     sed -e 's/^/\t/'
 }
-
+p
 function status {
     git status --porcelain --short | (grep "$checks" || true)
 }
