@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-# checks='^\(??\|A\| M| D\)'
-
 checks=$1
 if [ -z "$checks" ]; then
     checks='untracked,added,modified,deleted,unpushed'
