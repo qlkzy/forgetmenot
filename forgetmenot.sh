@@ -19,7 +19,7 @@ Options:
                     Should work with 'grep'.
                     Defaults to '^$' (i.e., exclude nothing)
 
-    -d <directory>  Root directory to check from.
+    -d <directory>  Base directory to check from.
                     Defaults to the value of HOME.
 EOF
 }
