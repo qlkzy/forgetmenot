@@ -1,9 +1,21 @@
 #!/bin/bash -e
 
-function main {
+checks=''
+exclude=''
+regex=''
 
-    checks=$1
-    exclude=$2
+while getopts c:e: opt; do
+    case "$opt" in
+        c)
+            checks="$OPTARG"
+            ;;
+        e)
+            exclude="$OPTARG"
+            ;;
+    esac
+done
+
+function main {
 
     if [ -z "$checks" ] || [ "$checks" == 'all' ]; then
         checks='untracked,added,modified,deleted,unpushed'
@@ -14,8 +26,6 @@ function main {
     if [ -z "$exclude" ]; then
         exclude='^$'
     fi
-
-    regex=''
 
     case $checks in
         *untracked*)
