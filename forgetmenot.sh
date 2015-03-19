@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-checks='^\(??\|A\)'
+checks='^\(??\|A\| M\)'
 
 function indent {
     sed -e 's/^/\t/'
