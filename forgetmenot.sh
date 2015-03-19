@@ -1,26 +1,20 @@
 #!/bin/bash -e
 
-checks='untracked'
+checks='^\(??\|A\)'
 
 function indent {
     sed -e 's/^/\t/'
 }
 
-function untracked {
-    git ls-files --others --exclude-standard | indent
-}
-
 function status {
-    if [[ "$checks" == *"untracked"* ]]; then
-        untracked
-    fi
+    git status --porcelain --short | (grep "$checks" || true)
 }
 
 find ~ -name '.git' -type d |
     sed -e 's/\.git$//' |
     while read x; do
         cd "$x"
-        status=`status`
+        status=`status | indent`
         if [ -n "$status" ]; then
             echo -e "$x\n$status"
         fi
