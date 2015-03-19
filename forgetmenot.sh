@@ -1,8 +1,16 @@
 #!/bin/bash -e
 
 checks=$1
-if [ -z "$checks" ]; then
+exclude=$2
+
+if [ -z "$checks" ] || [ "$checks" == 'all' ]; then
     checks='untracked,added,modified,deleted,unpushed'
+fi
+
+# our default exclude pattern is 'blank lines', which won't
+# hurt anything interesting
+if [ -z "$exclude" ]; then
+    exclude='^$'
 fi
 
 function indent {
@@ -52,6 +60,7 @@ regex="^\\($regex\\)"
 
 find ~ -name '.git' -type d |
     sed -e 's/\.git$//' |
+    grep -v "$exclude" |
     while read x; do
         cd "$x"
         status=`(status; unpushed) | indent`
