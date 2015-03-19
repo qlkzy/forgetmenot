@@ -1,20 +1,66 @@
 #!/bin/bash -e
 
+function usage {
+    cat <<EOF
+Options:
+    -c <checks>     List of checks to run, options are:
+                    - 'all' [default]
+                    - 'untracked'
+                    - 'added'
+                    - 'modified'
+                    - 'deleted'
+                    - 'unpushed'
+
+                    Checks should be separated with commas or given as separate
+                    -c arguments.
+
+
+    -e <pattern>    Pattern for directories to exclude.
+                    Should work with 'grep'.
+                    Defaults to '^$' (i.e., exclude nothing)
+
+    -d <directory>  Root directory to check from.
+                    Defaults to the value of HOME.
+EOF
+}
+
 checks=''
 exclude=''
 regex=''
-dir=~
+dir=$HOME
 
-while getopts c:e:d: opt; do
+while getopts :c:e:d:h opt; do
     case "$opt" in
         c)
-            checks="$OPTARG"
+            checks="$checks,$OPTARG"
             ;;
         e)
             exclude="$OPTARG"
             ;;
         d)
             dir="$OPTARG"
+            ;;
+        h)
+            usage
+            exit 0
+            ;;
+        *)
+            case "$OPTARG" in
+                c)
+                    echo "'-c' option requires an argument."
+                    ;;
+                e)
+                    echo "'-e' option requires an argument."
+                    ;;
+                d)
+                    echo "'-d' option requires an argument."
+                    ;;
+                *)
+                    echo "Unexpected option '-$OPTARG'."
+                    ;;
+            esac
+            usage
+            exit 1
             ;;
     esac
 done
